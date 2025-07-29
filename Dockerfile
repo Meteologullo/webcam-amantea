@@ -1,5 +1,6 @@
 FROM node:18-slim
 
+# Installa dipendenze di sistema per Puppeteer
 RUN apt-get update && apt-get install -y \
   libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libgbm1 libasound2 \
   libpangocairo-1.0-0 libxss1 libgtk-3-0 libxshmfence1 libglu1-mesa chromium \
@@ -8,6 +9,8 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 COPY package.json ./
+COPY package-lock.json ./
+
 RUN npm install
 
 COPY . .
