@@ -2,23 +2,34 @@ const express = require("express");
 const puppeteer = require("puppeteer");
 const app = express();
 
-app.get("/scrape", async (req, res) => {
+app.get("/", async (req, res) => {
   try {
     const browser = await puppeteer.launch({
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     const page = await browser.newPage();
-    await page.goto("https://amantea-webcam.agn19278.workers.dev/", {
+
+    // Carica la pagina webcam Ecowitt
+    await page.goto("https://www.ecowitt.net/home/index2?id=249399", {
       waitUntil: "networkidle2",
-      timeout: 15000,
+      timeout: 20000,
     });
 
-    const content = await page.evaluate(() => document.body.innerText);
+    // Estrai l'URL dell'immagine jpg dal DOM
+    const imageUrl = await page.evaluate(() => {
+      // Cerca l'elemento <img> che contiene il frame webcam (potrebbe essere da adattare)
+      const imgs = Array.from(document.querySelectorAll('img'));
+      // Filtro per immagini jpg
+      const jpgImgs = imgs.filter(img => img.src && img.src.endsWith('.jpg'));
+      // Prendo la prima immagine jpg che troviamo
+      return jpgImgs.length > 0 ? jpgImgs[0].src : null;
+    });
+
     await browser.close();
 
-    const match = content.match(/https?:\/\/[^\s]+\.jpg/);
-    if (match) {
-      res.redirect(match[0]);
+    if (imageUrl) {
+      // Fai redirect all'immagine
+      res.redirect(imageUrl);
     } else {
       res.status(404).send("Nessuna immagine trovata.");
     }
@@ -29,4 +40,5 @@ app.get("/scrape", async (req, res) => {
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log("Server avviato sulla porta " + port));
+
 
