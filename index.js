@@ -2,7 +2,7 @@ const express = require("express");
 const puppeteer = require("puppeteer");
 const app = express();
 
-app.get("/", async (req, res) => {
+app.get("/scrape", async (req, res) => {
   try {
     const browser = await puppeteer.launch({
       args: ['--no-sandbox', '--disable-setuid-sandbox']
@@ -29,3 +29,4 @@ app.get("/", async (req, res) => {
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log("Server avviato sulla porta " + port));
+
