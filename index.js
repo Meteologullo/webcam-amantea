@@ -4,9 +4,9 @@ const app = express();
 
 app.get("/", async (req, res) => {
   try {
-    console.log("Avvio browser Puppeteer...");
     const browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
     });
     const page = await browser.newPage();
 
@@ -21,25 +21,18 @@ app.get("/", async (req, res) => {
       return jpgImgs.length > 0 ? jpgImgs[0].src : null;
     });
 
-    console.log("URL immagine estratta:", imageUrl);
-
     if (imageUrl) {
       res.redirect(imageUrl);
     } else {
       res.status(404).send("Nessuna immagine trovata.");
     }
 
-    // Non chiudere subito il browser, lascialo aperto per 10 secondi
-    setTimeout(async () => {
-      console.log("Chiusura browser Puppeteer...");
-      await browser.close();
-    }, 10000);
-
+    await browser.close();
   } catch (err) {
-    console.error("Errore nell'elaborazione:", err);
     res.status(500).send("Errore: " + err.message);
   }
 });
 
 const port = process.env.PORT || 8080;
 app.listen(port, () => console.log("Server avviato sulla porta " + port));
+
