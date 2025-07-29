@@ -23,14 +23,17 @@ app.get("/", async (req, res) => {
     await browser.close();
 
     if (imageUrl) {
+      console.log("Immagine trovata:", imageUrl);
       res.redirect(imageUrl);
     } else {
+      console.log("Nessuna immagine trovata.");
       res.status(404).send("Nessuna immagine trovata.");
     }
   } catch (err) {
+    console.error("Errore:", err.message);
     res.status(500).send("Errore: " + err.message);
   }
 });
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 app.listen(port, () => console.log("Server avviato sulla porta " + port));
